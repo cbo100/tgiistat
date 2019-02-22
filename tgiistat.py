@@ -117,9 +117,9 @@ class Fetcher(object):
 
     def get(self):
         if not self.session:
-            self.session = self.connect()
+            self.session = requests.Session() #self.connect()
 
-        modem_url = '%s/modals/broadband-bridge-modal.lp' % self.top_url
+        modem_url = '%s/modals/broadband-modal.lp' % self.top_url
         r = self.session.get(modem_url, timeout = self.REQUEST_TIMEOUT)
 
         gateway_url = '%s/modals/gateway-modal.lp' % self.top_url
@@ -176,7 +176,7 @@ def parse_broadband(res, html):
     """
     soup = BeautifulSoup(html, 'html.parser')
 
-    res['datetime'] = datetime.datetime.now()
+    res['datetime'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     res['up_rate'], res['down_rate'] = fetch_pair(soup, "Line Rate", 'Mbps')
     res['up_maxrate'], res['down_maxrate'] = fetch_pair(soup, "Maximum Line rate", 'Mbps')
     res['up_power'], res['down_power'] = fetch_pair(soup, "Output Power", 'dBm')
@@ -295,7 +295,7 @@ Configure your details in tgiistat.toml\n
     parser.add_argument('--csv-headers', action="store_true", help="CSV-style headers")
     parser.add_argument('--poll', '-p', type=int, default=0, help='interval (in seconds) between polls')
     # --parse is useful for debugging parse() from a saved broadband-bridge-modal.lp html file
-    parser.add_argument('--parse', type=argparse.FileType('r'), help="Parse html from a file", metavar='broadband-bridge-modal.lp')
+    parser.add_argument('--parse', type=argparse.FileType('r'), help="Parse html from a file", metavar='broadband-modal.lp')
     parser.add_argument('--gwparse', type=argparse.FileType('r'), help="Parse gateway html from a file", metavar='gateway-modal.lp')
 
     args = parser.parse_args()
